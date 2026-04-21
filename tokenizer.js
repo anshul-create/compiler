@@ -1,4 +1,4 @@
-function tokenizer(input) {
+export function tokenizer(input) {
   let tokens = [];
   let i = 0;
 
@@ -10,6 +10,7 @@ function tokenizer(input) {
       continue;
     }
 
+    //numbers
     if (/[0-9]/.test(char)) {
       let num = "";
       while (i < input.length && /[0-9]/.test(input[i])) {
@@ -19,7 +20,7 @@ function tokenizer(input) {
       tokens.push({ type: "NUMBER", value: Number(num) });
       continue;
     }
-
+//characters
     if (/[a-zA-Z]/.test(char)) {
       let name = "";
       while (i < input.length && /[a-zA-Z]/.test(input[i])) {
@@ -29,7 +30,7 @@ function tokenizer(input) {
       tokens.push({ type: "IDENTIFIER", value: name });
       continue;
     }
-
+    //operators
     if (char == "+") tokens.push({ type: "PLUS" });
     else if (char === "-") tokens.push({ type: "MINUS" });
     else if (char === "*") tokens.push({ type: "STAR" });
@@ -49,6 +50,7 @@ function tokenizer(input) {
   return tokens;
 }
 
-const output = tokenizer(" x == 2");
-console.log(output);
-// console.log(/[0-9]/.test("="));
+
+
+
+
