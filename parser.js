@@ -1,60 +1,84 @@
-import { tokenizer } from "./tokenizer.js";
-
-export function parser(tokens) {
+export function parser(tokensInput) {
+  let tokens = tokensInput;
   let i = 0;
-
-  function consume() {
-    return tokens;
-    i++;
-  }
 
   function peek() {
     return tokens[i];
   }
 
-  function parseExpression() {
+  function consume() {
+    return tokens[i++];
+  }
+
+  // Primary → numbers and (expression)
+  function parsePrimary() {
+    const token = consume();
+
+    if (!token) {
+      throw new Error("Unexpected end of input");
+    }
+
+    if (token.type === "NUMBER") {
+      return { type: "NumberLiteral", value: token.value };
+    }
+
+    if (token.type === "LEFTPARENTHESIS") {
+      const expr = parseExpression();
+
+      if (!peek() || peek().type !== "RIGHTPARENTHESIS") {
+        throw new Error("Expected ')'");
+      }
+
+      consume(); // consume ')'
+      return expr;
+    }
+
+    throw new Error("Unexpected token: " + token.type);
+  }
+
+  // Term → *, /
+  function parseTerm() {
     let left = parsePrimary();
 
-    while (
-      peek() &&
-      ["PLUS", "MINUS", "STAR", "SLASH", "EQUALSEQUALS"].includes(peek().type)
-    ) {
+    while (peek() && ["STAR", "SLASH"].includes(peek().type)) {
       const operator = consume();
       const right = parsePrimary();
 
       left = {
         type: "BinaryExpression",
-        operator: operator.value,
+        operator: operator.type,
         left,
         right,
       };
     }
+
     return left;
   }
 
-  function parsePrimary() {
-    const token = consume();
+  // Expression → +, -
+  function parseExpression() {
+    let left = parseTerm();
 
-    if (token.type === "NUMBER") {
-      return { type: "NUMBERLITERAL", value: token.value };
-    }
-    if (token.type === "IDENTIFIER") {
-      return { type: "IDENTIFIER", name: token.value };
+    while (peek() && ["PLUS", "MINUS"].includes(peek().type)) {
+      const operator = consume();
+      const right = parseTerm();
+
+      left = {
+        type: "BinaryExpression",
+        operator: operator.type,
+        left,
+        right,
+      };
     }
 
-    if(token.type === "LEFTPARANTHESIS"){
-        const expr = parseExpression();
-        consume();
-
-        if(token.type != "RIGHTPARANTHESIS"){
-            throw new Error("Expected : ')'");
-        }
-        consume();
-        return expr;
-    }
-    throw new Error("Unexpected token" + token.type);
+    return left;
   }
+
+  const ast = parseExpression();
+
+  if (i < tokens.length) {
+    throw new Error("Unexpected tokens at end");
+  }
+
+  return ast;
 }
-
-
-
