@@ -1,6 +1,6 @@
-//3 + 5 * 2
+// int x = 10;
 
-export function evaluate(node) {
+export function evaluate(node, env = new Map()) {
   if (!node || node == null) {
     throw new Error("Invalid node");
   }
