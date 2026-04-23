@@ -1,17 +1,16 @@
 import { tokenizer } from "./tokenizer.js";
 import { parser } from "./parser.js";
+import { evaluate } from "./Interpreter.js";
 
-const code = "(3+5)*2";
+const code = "(1 / ";
 
-try {
+try{
   const tokens = tokenizer(code);
-  console.log('tokens');
-  console.log(tokens);
-
   const ast = parser(tokens);
+  const result = evaluate(ast);
 
-  console.log("\nast :");
-  console.log(JSON.stringify(ast, null, 2));
-} catch (error) {
-  console.log("Parsing Error", error.message);
+  console.log(result);
+
+}catch(e){
+  console.log("error : ", e.message);
 }

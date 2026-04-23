@@ -1,36 +1,38 @@
 //3 + 5 * 2
 
-function interpreter(node) {
-  if (node.type === "NUMBERLITERAL") {
+export function evaluate(node) {
+  if (!node || node == null) {
+    throw new Error("Invalid node");
+  }
+
+
+  if (node.type === "NumberLiteral") {
     return node.value;
   }
 
-  if (!node.left || !node.right) {
-    throw new Error("Invalid AST structure");
-  }
-
+  //
 
   if (node.type === "BinaryExpression") {
-    //go left
-    const left = interpreter(node.left); //left subtree
-    const right = interpreter(node.right); //right subtree
+    if (!node.left || !node.right) {
+      throw new Error("Invalid AST structure");
+    }
+    //recursive deeply
+    const left = evaluate(node.left); //left subtree
+    const right = evaluate(node.right); //right subtree
 
-    if(typeof left != "number" || typeof right != "number"){
-        throw new Error("Both operand must be number");
+    if (typeof left != "number" || typeof right != "number") {
+      throw new Error("Both operand must be number");
     }
 
-    //go right
-    //return
-
     switch (node.operator) {
-      case "+":
+      case "PLUS":
         return left + right;
-      case "-":
+      case "MINUS":
         return left - right;
-      case "*":
+      case "STAR":
         return left * right;
-      case "/":
-        if (node.right === 0) {
+      case "SLASH":
+        if (right === 0) {
           throw new Error("Division by zero");
         }
         return left / right;
